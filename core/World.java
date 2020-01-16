@@ -65,7 +65,7 @@ public class World {
 	//自定义，单次计数结点之间重复收到的消息（我收到了A，你也收到了A，只计算一次）
 	public static Set<String> singleCountDeliveredMessages;
 	static {
-		singleCountDeliveredMessages = new HashSet<>();
+		singleCountDeliveredMessages = new HashSet<String>();
 	}
 
 	/**
