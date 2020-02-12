@@ -52,9 +52,9 @@ public class ConnectivityGrid extends ConnectivityOptimizer {
 	 */
 	public static final String CELL_SIZE_MULT_S = "cellSizeMult";
 	/** default value for cell size multiplier ({@value}) */
-//	public static final int DEF_CON_CELL_SIZE_MULT = 5;
+	public static final int DEF_CON_CELL_SIZE_MULT = 5;
 	//自定义 修改默认值5为1
-	public static final int DEF_CON_CELL_SIZE_MULT = 1;
+//	public static final int DEF_CON_CELL_SIZE_MULT = 1;
 	
 	private GridCell[][] cells;
 	private HashMap<NetworkInterface, GridCell> ginterfaces;

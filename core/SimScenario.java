@@ -9,8 +9,13 @@ import input.EventQueueHandler;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import com.sun.javafx.collections.MappingChange.Map;
+
+import core.custom.Gauss;
+import core.custom.LinearEquation;
 import movement.MapBasedMovement;
 import movement.MovementModel;
 import movement.map.SimMap;
@@ -117,7 +122,13 @@ public class SimScenario implements Serializable {
 	private List<UpdateListener> updateListeners;
 	/** Global application event listeners */
 	private List<ApplicationListener> appListeners;
-
+	
+	//自定义，直线方程map
+	public static HashMap<Integer, LinearEquation<Double, Double>> linearMap = new HashMap<Integer,LinearEquation<Double,Double>>();
+	private List<Coord> sourceList = new ArrayList<>();
+	private List<Coord> destList = new ArrayList<>();
+	public static final int dTh = 200;
+	
 	static {
 		DTNSim.registerForReset(SimScenario.class.getCanonicalName());
 		reset();
@@ -393,6 +404,23 @@ public class SimScenario implements Serializable {
 						this.movementListeners,	gid, interfaces, comBus, 
 						mmProto, mRouterProto);
 				hosts.add(host);
+//				自定义,获得源结点和目的结点的所有坐标
+				if(gid.equals("suffer")) {
+					sourceList.add(host.getLocation());
+				}
+				if(gid.equals("shelter")) {
+					destList.add(host.getLocation());
+				}
+			}
+
+		}
+		//自定义，在将源结点和目的结点的所有坐标获得完毕之后，开始计算直线方程，并添加进map里
+		int count = 0;
+		for(Coord i : sourceList) {
+			for(Coord j : destList) {
+				double[] coefficient = Gauss.calculate(i, j);
+				LinearEquation<Double, Double> linearEquation = new LinearEquation<Double, Double>(coefficient[0], coefficient[1]);
+				linearMap.put(count++, linearEquation);
 			}
 		}
 	}

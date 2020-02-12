@@ -23,6 +23,14 @@ import core.Settings;
 import core.SimClock;
 
 /**
+ * 一种基于节点历史信息的概率路由转发协议，在假设网络中的节点时非完全随机性移动的情况下，
+ 
+* 对节点的移动趋势进行概率性的预测，从而通过利用节点活动的重复性对网络的缓存和资源进行有效的控制。
+* 如果节点A、B经常通信，同时节点B、C又频繁
+*相遇，那么C就是A转发消息过程中的一个潜在的优良中继
+*节点。
+*如果节点A、曰有一段时间没有相遇，则A、B节
+*点的递交预测概率就会衰减。
  * Implementation of PRoPHET router as described in 
  * <I>Probabilistic routing in intermittently connected networks</I> by
  * Anders Lindgren et al.

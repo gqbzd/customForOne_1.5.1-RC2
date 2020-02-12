@@ -620,7 +620,7 @@ public abstract class ActiveRouter extends MessageRouter {
 				if (this.getFreeBufferSize() < 0) {
 					this.makeRoomForMessage(0);//设置为0，表示这里并没有清除缓存
 				}
-				sendingConnections.remove(i);
+				sendingConnections.remove(i);//断开当前连接(传输完成或连接已经断开)
 			}
 			else {
 				/* index increase needed only if nothing was removed */
@@ -631,7 +631,7 @@ public abstract class ActiveRouter extends MessageRouter {
 		/* time to do a TTL check and drop old messages? Only if not sending */
 		if (SimClock.getTime() - lastTtlCheck >= ttlCheckInterval && 
 				sendingConnections.size() == 0) {
-			dropExpiredMessages();
+			dropExpiredMessages();//根据ttl清除掉过期的消息
 			lastTtlCheck = SimClock.getTime();
 		}
 		

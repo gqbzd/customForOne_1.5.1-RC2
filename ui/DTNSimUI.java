@@ -92,7 +92,7 @@ public abstract class DTNSimUI {
 				
 		try {
 			settings = new Settings();
-			this.scen = SimScenario.getInstance();
+			this.scen = SimScenario.getInstance();//创建所有路由器结点，创建所有地图结点
 
 			// add reports
 			for (int i=1, n = settings.getInt(NROF_REPORT_S); i<=n; i++){

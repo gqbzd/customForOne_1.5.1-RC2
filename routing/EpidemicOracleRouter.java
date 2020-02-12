@@ -10,7 +10,7 @@ import java.util.List;
 import core.*;
 
 /**
- * <P>
+ * <P>当消息被成功投递时，将所有持有此消息的结点删除此消息(即网络中所有该消息副本均删除)
  * Epidemic message router with an oracle that tells when a message is delivered
  * and that message is then removed from all nodes that use this routing module.
  * This router also <B>ignores message size and all messages are delivered 
