@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.sun.javafx.collections.MappingChange.Map;
 
 import core.custom.Gauss;
 import core.custom.LinearEquation;
@@ -87,6 +86,17 @@ public class SimScenario implements Serializable {
 	/** package where to look for application classes */
 	private static final String APP_PACKAGE = "applications.";
 	
+	/**
+	 * 自定义，研究中的理论超出距离的阈值:dth
+	 */
+	private static final String DTH = "dth";
+	public static int dTh = 200;
+	
+	//测试用
+	public static int errorNode;
+	public static boolean key = true;
+	//以上是测试
+	
 	/** The world instance */
 	private World world;
 	/** List of hosts in this simulation */
@@ -127,7 +137,7 @@ public class SimScenario implements Serializable {
 	public static HashMap<Integer, LinearEquation<Double, Double>> linearMap = new HashMap<Integer,LinearEquation<Double,Double>>();
 	private List<Coord> sourceList = new ArrayList<>();
 	private List<Coord> destList = new ArrayList<>();
-	public static final int dTh = 200;
+	
 	
 	static {
 		DTNSim.registerForReset(SimScenario.class.getCanonicalName());
@@ -144,6 +154,10 @@ public class SimScenario implements Serializable {
 	protected SimScenario() {
 		Settings s = new Settings(SCENARIO_NS);
 		nrofGroups = s.getInt(NROF_GROUPS_S);
+		//自定义：要么从配置里Scenario.dth读取此配置，要么默认值为200m
+		if(s.contains(DTH)) {
+			dTh = s.getInt(DTH);
+		}
 
 		this.name = s.valueFillString(s.getSetting(NAME_S));
 		this.endTime = s.getDouble(END_TIME_S);
@@ -319,6 +333,8 @@ public class SimScenario implements Serializable {
 		return this.appListeners;
 	}
 	
+//	public static int publicNrofHosts;
+	
 	/**
 	 * Creates hosts for the scenario
 	 * 此处不仅创建了路由器（主机）结点，还将主机所拥有的接口储存在了逻辑上地图的某个网格单元，实际上主机的连接是通过判断接口是否相邻，而不是判断主机是否相邻
@@ -333,6 +349,12 @@ public class SimScenario implements Serializable {
 			s.setSecondaryNamespace(GROUP_NS);
 			String gid = s.getSetting(GROUP_ID_S);
 			int nrofHosts = s.getInt(NROF_HOSTS_S);
+			
+			//test begin
+//			if(i==nrofGroups) {
+//				publicNrofHosts = nrofHosts;
+//			}
+			//test over
 			int nrofInterfaces = s.getInt(NROF_INTERF_S);
 			int appCount;
 
@@ -404,8 +426,10 @@ public class SimScenario implements Serializable {
 						this.movementListeners,	gid, interfaces, comBus, 
 						mmProto, mRouterProto);
 				hosts.add(host);
+				
+				
 //				自定义,获得源结点和目的结点的所有坐标
-				if(gid.equals("suffer")) {
+				if(gid.equals("sufferer")) {
 					sourceList.add(host.getLocation());
 				}
 				if(gid.equals("shelter")) {

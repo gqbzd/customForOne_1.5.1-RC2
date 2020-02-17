@@ -5,6 +5,9 @@
 package ui;
 
 import core.SimClock;
+import movement.MovementModel;
+import report.Report;
+import routing.MessageRouter;
 
 /**
  * Simple text-based user interface.
@@ -19,7 +22,7 @@ public class DTNSimTextUI extends DTNSimUI {
 		double simTime = SimClock.getTime();
 		double endTime = scen.getEndTime();
 	
-		print("Running simulation '" + scen.getName()+"'");
+		print("Running simulation '" + scen.getName()+"_seed"+MovementModel.reportSeed+"_buffer"+Report.convertIdentification(MessageRouter.reportBufferSize)+"'");
 
 		startTime = System.currentTimeMillis();
 		lastUpdateRt = startTime;
@@ -42,7 +45,7 @@ public class DTNSimTextUI extends DTNSimUI {
 		done();
 		this.update(true); // force final UI update
 		
-		print("Simulation done in " + String.format("%.2f", duration) + "s");
+		print("Simulation done in " + String.format("%.2f", duration) + "s at this time");
 	
 	}
 	

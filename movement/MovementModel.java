@@ -271,6 +271,9 @@ public abstract class MovementModel {
 	 */
 	public abstract MovementModel replicate();
 	
+	/** 自定义，用来在报告输出时的文件名，更好标识文件中的内容*/
+	public static int reportSeed;
+	
 	/**
 	 * Resets all static fields to default values
 	 */
@@ -278,6 +281,7 @@ public abstract class MovementModel {
 		Settings s = new Settings(MOVEMENT_MODEL_NS);
 		if (s.contains(RNG_SEED)) {
 			int seed = s.getInt(RNG_SEED);
+			reportSeed = seed;
 			rng = new Random(seed);
 		}
 		else {

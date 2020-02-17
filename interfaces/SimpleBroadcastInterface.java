@@ -12,6 +12,7 @@ import core.CBRConnection;
 import core.Connection;
 import core.NetworkInterface;
 import core.Settings;
+import core.SimScenario;
 
 /**
  * A simple Network Interface that provides a constant bit-rate service, where
@@ -44,7 +45,7 @@ public class SimpleBroadcastInterface extends NetworkInterface {
 	 * 连接当前的接口与传进来的参数接口
 	 * @param anotherInterface The interface to connect to
 	 */
-	public void connect(NetworkInterface anotherInterface) {
+	public boolean connect(NetworkInterface anotherInterface) {
 //		if(this.host.toString().equals("s0")) {
 //			System.out.println("s0->"+anotherInterface.getHost().toString());
 //		}
@@ -67,7 +68,9 @@ public class SimpleBroadcastInterface extends NetworkInterface {
 //				System.out.println("break");
 //			}
 			connect(con,anotherInterface);
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -81,11 +84,17 @@ public class SimpleBroadcastInterface extends NetworkInterface {
 		}
 		
 		// First break the old ones
-		optimizer.updateLocation(this);
+		optimizer.updateLocation(this);//更新结点移动后在不同单元中进行转移
+//		自定义，有消息才能主动建立连接，可以被动建立连接,这行代码之前写在了World类updateHosts()方法的循环里，
+//		让我找了好久的bug,bug是源结点不能建立连接，因为上行代码没有执行，也就没有更新结点在单元空间的位置，邻居结点获得不到导致的连接建立不了
+		if(getHost().getMessageCollection().size() == 0) {
+			return;
+		}
 		for (int i=0; i<this.connections.size(); ) {
 			Connection con = this.connections.get(i);
 			NetworkInterface anotherInterface = con.getOtherInterface(this);
 
+			
 			// all connections should be up at this stage
 			assert con.isUp() : "Connection " + con + " was down!";
 
@@ -100,9 +109,13 @@ public class SimpleBroadcastInterface extends NetworkInterface {
 		// Then find new possible connections
 		Collection<NetworkInterface> interfaces =
 			optimizer.getNearInterfaces(this);
+		int count = 0;
 		for (NetworkInterface i : interfaces) {
-			connect(i);
+			if(connect(i)) {
+				count++;
+			}
 		}
+		
 	}
 
 	/** 

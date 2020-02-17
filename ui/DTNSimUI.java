@@ -74,7 +74,7 @@ public abstract class DTNSimUI {
 	 */
 	public void start() {
 		initModel();
-		runSim();
+		runSim();//这一步会区分到底是用命令模式运行,还是图形模式运行
 	}
 	
 	/**
@@ -126,6 +126,7 @@ public abstract class DTNSimUI {
 	}
 	
 	/**
+	 * 关闭所有报告的文件输出
 	 * Runs maintenance jobs that are needed before exiting.
 	 */
 	public void done() {

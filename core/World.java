@@ -64,9 +64,6 @@ public class World {
 	
 	//自定义，单次计数结点之间重复收到的消息（我收到了A，你也收到了A，只计算一次）
 	public static Set<String> singleCountDeliveredMessages;
-	static {
-		singleCountDeliveredMessages = new HashSet<String>();
-	}
 
 	/**
 	 * Constructor.
@@ -87,6 +84,9 @@ public class World {
 		this.isCancelled = false;
 		this.isConSimulated = false;
 
+		//自定义，每次实验都需要重新new该对象
+		singleCountDeliveredMessages = new HashSet<String>();
+		
 		setNextEventQueue();
 		initSettings();
 	}
@@ -190,14 +190,21 @@ public class World {
 		for (UpdateListener ul : this.updateListeners) {
 			ul.updated(this.hosts);
 		}
+		
+//		System.out.print(symbols[rndSymbol.nextInt(24)]);
+		System.out.print("*");
 	}
-
+	
+	public static String[] symbols = "αβγδεζηθικλμνξοπρστυφχψω".split("");
+	public static Random rndSymbol = new Random();
 	/**
+	 * 这个方法更新所有结点的连接情况，并转发消息;
 	 * Updates all hosts (calls update for every one of them). If update
 	 * order randomizing is on (updateOrder array is defined), the calls
 	 * are made in random order.
 	 */
 	private void updateHosts() {
+		
 		//分两种情况，根据节点是否随机顺序，依次更新每一个节点
 		//按网络地址network address排序的
 		if (this.updateOrder == null) { // randomizing is off
@@ -219,9 +226,10 @@ public class World {
 				if (this.isCancelled) {
 					break;
 				}
+				//这里会遍历每个结点,返回时机:1.其中单个结点要么有一条连接转发了一条消息;2.要么单个结点中将其所有连接遍历完都没有转发成功哪怕一则消息
 				this.updateOrder.get(i).update(simulateConnections);
 			}
-//			System.out.println("network layer update success");
+//			System.out.println("所有结点轮循完毕");
 		}
 		//simulateConOnce标识连接是否只更新一次，默认为false,可以在配置文件中更改
 		if (simulateConOnce && simulateConnections) {
