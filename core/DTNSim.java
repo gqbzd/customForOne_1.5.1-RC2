@@ -73,15 +73,16 @@ public class DTNSim {
 		else {
 			confFiles = new String[] {null};
 		}
-		
+		//将配置文件读取到程序中
 		initSettings(confFiles, firstConfIndex);
 		
 		if (batchMode) {
-			long startTime = System.currentTimeMillis();
+			long startTime = System.currentTimeMillis();//这个用来计算整个程序运行完毕花费的时间
+			//因为配置文件中一个参数可以写成[*;*;*;*;*]的形式,这里举例为五个,程序分别以不同的参数运行五次
 			for (int i=nrofRuns[0]; i<nrofRuns[1]; i++) {
 				print("Run " + (i+1) + "/" + nrofRuns[1]);
-				Settings.setRunIndex(i);
-				resetForNextRun();
+				Settings.setRunIndex(i);//设置本次程序运行需要的参数索引
+				resetForNextRun();//清除上次程序运行产生的数据
 				new DTNSimTextUI().start();
 			}
 			double duration = (System.currentTimeMillis() - startTime)/1000.0;
@@ -130,6 +131,9 @@ public class DTNSim {
 	}
 	
 	/**
+	 * 由于程序要根据不同的参数重复运行,以防上一次程序运行所保存的数据对本次程序运行所造成干扰,
+	 * 所以得清除上次程序运行的数据,这个方法是将需要删除数据的类给记录下来,当下一次程序运行的时候
+	 * 会调用{@link #resetForNextRun()}方法,进行遍历清除数据
 	 * Registers a class for resetting. Reset is performed after every
 	 * batch run of the simulator to reset the class' state to initial
 	 * state. All classes that have static fields that should be resetted
@@ -176,6 +180,7 @@ public class DTNSim {
 	}
 	
 	/**
+	 * 因为配置文件中一个参数可以写成[*;*;*;*;*]的形式,这里举例为五个,程序分别以不同的参数运行五次
 	 * Parses the number of runs, and an optional starting run index, from a 
 	 * command line argument
 	 * @param arg The argument to parse
@@ -184,12 +189,14 @@ public class DTNSim {
 	private static int[] parseNrofRuns(String arg) {
 		int val[] = {0,1};	
 		try {
+			//这里有两种写法,第1种,举例1:5,val[0]取得第1个元素并且减1,所以是val[0]=0,val[1]=5;
 			if (arg.contains(RANGE_DELIMETER)) {
 				val[0] = Integer.parseInt(arg.substring(0, 
 						arg.indexOf(RANGE_DELIMETER))) - 1;
 				val[1] = Integer.parseInt(arg.substring(arg.
 						indexOf(RANGE_DELIMETER) + 1, arg.length()));
 			}
+			//第2种写法,只有一个数字,举例5,那么val[0]=0,val[1]=5;
 			else {
 				val[0] = 0;
 				val[1] = Integer.parseInt(arg);

@@ -25,6 +25,7 @@ import core.Settings;
 import core.SettingsError;
 import core.SimClock;
 import core.SimError;
+import core.SimScenario;
 import core.World;
 import input.MessageEventGenerator;
 import report.custom.SingleCountDeliveryReport;
@@ -100,6 +101,8 @@ public abstract class MessageRouter {
 	private DTNHost host;
 	/** size of the buffer */
 	private int bufferSize;
+	/** 自定义，用来在报告输出时的文件名，更好标识文件中的内容*/
+	public static int reportBufferSize;
 	/** TTL for all messages */
 	protected int msgTtl;
 	/** Queue mode for sending messages */
@@ -116,11 +119,13 @@ public abstract class MessageRouter {
 	 */
 	public MessageRouter(Settings s) {
 		this.bufferSize = Integer.MAX_VALUE; // defaults to rather large buffer	
+		reportBufferSize = this.bufferSize;
 		this.msgTtl = Message.INFINITE_TTL;
 		this.applications = new HashMap<String, Collection<Application>>();
 		
 		if (s.contains(B_SIZE_S)) {
 			this.bufferSize = s.getInt(B_SIZE_S);
+			reportBufferSize = this.bufferSize;
 		}
 		if (s.contains(MSG_TTL_S)) {
 			this.msgTtl = s.getInt(MSG_TTL_S);
@@ -383,6 +388,7 @@ public abstract class MessageRouter {
 		isFirstDelivery = isFinalRecipient &&
 		!isDeliveredMessage(aMessage);//消息传递到目的节点，且只收第一次传递成功的，其他重复的信息拒绝接收
 
+		
 		/*** 将消息根据实际情况放入相应的缓冲区 ***/
 		if (!isFinalRecipient && outgoing!=null) {
 			// not the final recipient and app doesn't want to drop the message
@@ -394,7 +400,7 @@ public abstract class MessageRouter {
 			//自定义，接收到信息，打印信息内容
 			int received = World.singleCountDeliveredMessages.size();
 			int total = SingleCountDeliveryReport.created;
-			System.out.println(this.host.toString()+" receive: id:"+aMessage.getId()+";contents:"+aMessage.getContents()+
+			System.out.println("======>"+this.host.toString()+" receive from "+aMessage.getFrom().toString()+": id:"+aMessage.getId()+";contents:"+aMessage.getContents()+
 					";delivered rate:"+received+"/"+total+"="+(float)received/total+";time:"+SimClock.getTime());
 			this.deliveredMessages.put(id, aMessage);//incomingMessages --> deliveredMessages
 		} else if (outgoing == null) {
@@ -451,7 +457,7 @@ public abstract class MessageRouter {
 	 */
 	protected void addToMessages(Message m, boolean newMessage) {
 		this.messages.put(m.getId(), m);
-		//触发监听器
+		//新产生的消息会触发消息监听器，但如果是转发成功的则不会触发
 		if (newMessage) {
 			for (MessageListener ml : this.mListeners) {
 				ml.newMessage(m);

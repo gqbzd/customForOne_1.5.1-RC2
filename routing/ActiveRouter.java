@@ -22,6 +22,7 @@ import core.MessageListener;
 import core.NetworkInterface;
 import core.Settings;
 import core.SimClock;
+import core.SimScenario;
 
 /**
  * Superclass of active routers. Contains convenience methods (e.g. 
@@ -195,7 +196,7 @@ public abstract class ActiveRouter extends MessageRouter {
 		
 		retVal = con.startTransfer(getHost(), m);
 		if (retVal == RCV_OK) { // started transfer
-			addToSendingConnections(con);
+			addToSendingConnections(con);//将con添加到正在发送消息的连接标志变量里
 		}
 		else if (deleteDelivered && retVal == DENIED_OLD && 
 				m.getTo() == con.getOtherNode(this.getHost())) {
@@ -239,6 +240,7 @@ public abstract class ActiveRouter extends MessageRouter {
 			return TRY_LATER_BUSY; // only one connection at a time
 		}
 	
+		//本结点已经有这个消息了所以就不收了
 		if ( hasMessage(m.getId()) || isDeliveredMessage(m) ||
 				super.isBlacklistedMessage(m.getId())) {
 			return DENIED_OLD; // already seen this message -> reject it
@@ -438,10 +440,11 @@ public abstract class ActiveRouter extends MessageRouter {
 	 */
 	protected Connection tryMessagesToConnections(List<Message> messages,
 			List<Connection> connections) {
+		//这里本身是在遍历所有连接,然后给所有连接发送消息,而其中如果有一条连接转发成功了一则消息,那么便返回那条转发消息成功的连接con
 		for (int i=0, n=connections.size(); i<n; i++) {
 			Connection con = connections.get(i);
 			Message started = tryAllMessages(con, messages); 
-			if (started != null) { 
+			if (started != null) { //转发成功后,started不为null,
 				return con;
 			}
 		}
@@ -464,7 +467,7 @@ public abstract class ActiveRouter extends MessageRouter {
 		}
 
 		List<Message> messages = 
-			new ArrayList<Message>(this.getMessageCollection());
+			new ArrayList<Message>(this.getMessageCollection());//重新封装
 		this.sortByQueueMode(messages);
 
 		return tryMessagesToConnections(messages, connections);
@@ -592,6 +595,8 @@ public abstract class ActiveRouter extends MessageRouter {
 	public void update() {		
 		super.update();
 		
+		
+		
 		/* in theory we can have multiple sending connections even though
 		  currently all routers allow only one concurrent sending connection */
 		for (int i=0; i<this.sendingConnections.size(); ) {
@@ -600,6 +605,17 @@ public abstract class ActiveRouter extends MessageRouter {
 			
 			/* finalize ready transfers */
 			if (con.isMessageTransferred()) {//消息是否传输完毕，即是否过了(1.0*m.getSize())/this.speed没
+				//test begin
+//				if(SimScenario.publicNrofHosts == 200 ) {
+//					if(SimScenario.key) {
+//						SimScenario.errorNode = con.getOtherNode(getHost()).getAddress();
+//						SimScenario.key = false;
+//					}
+////					System.out.println(getHost().getAddress()+">"+con.getOtherNode(getHost()).getAddress()+":"+con.getMessage().getId());
+////					System.out.println(this.sendingConnections.size());
+//					
+//				}
+//				//test over
 				if (con.getMessage() != null) {
 					transferDone(con);
 					con.finalizeTransfer();//完成消息传输

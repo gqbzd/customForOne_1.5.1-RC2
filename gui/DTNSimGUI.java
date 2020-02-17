@@ -99,13 +99,14 @@ public class DTNSimGUI extends DTNSimUI {
 		double simTime = SimClock.getTime();
 		double endTime = scen.getEndTime();
 		
-		startGUI();
+		startGUI();//图形界面
 		
 		// Startup DTN2Manager
 		// XXX: Would be nice if this wasn't needed..
 		DTN2Manager.setup(world);
 		
 		while (simTime < endTime && !simCancelled){
+			//图形界面的暂停按钮
 			if (guiControls.isPaused()) {
 				wait(10); // release CPU resources when paused
 			}

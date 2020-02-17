@@ -300,7 +300,7 @@ abstract public class NetworkInterface implements ModuleCommunicationListener {
 	 * connect(Connection, NetworkInterface) for the actual connection.
 	 * @param anotherInterface The interface to connect to
 	 */
-	public abstract void connect(NetworkInterface anotherInterface);
+	public abstract boolean connect(NetworkInterface anotherInterface);
 
 	/**
 	 * Connects this host to another host. The derived class should check 
@@ -342,24 +342,25 @@ abstract public class NetworkInterface implements ModuleCommunicationListener {
 	}
 
 	/**
+	 * 结点之间都在对方的信号抵达范围内;
 	 * Returns true if another interface is within radio range of this interface
 	 * and this interface is also within radio range of the another interface.
 	 * @param anotherInterface The another interface
 	 * @return True if the interface is within range, false if not
 	 */
 	protected boolean isWithinRange(NetworkInterface anotherInterface) {
-//		double smallerRange = anotherInterface.getTransmitRange();
-//		double myRange = getTransmitRange();
-//		if (myRange < smallerRange) {
-//			smallerRange = myRange;
-//		}
-//
-//		return this.host.getLocation().distance(
-//				anotherInterface.getHost().getLocation()) <= smallerRange;
-		//自定义，只要两个接口之间的距离小于等于当前结点（而不是目的结点）的传输距离，就return true;
+		double smallerRange = anotherInterface.getTransmitRange();
 		double myRange = getTransmitRange();
+		if (myRange < smallerRange) {
+			smallerRange = myRange;
+		}
+
 		return this.host.getLocation().distance(
-				anotherInterface.getHost().getLocation()) <= myRange;
+				anotherInterface.getHost().getLocation()) <= smallerRange;
+		//自定义，只要两个接口之间的距离小于等于当前结点（而不是目的结点）的传输距离，就return true;
+//		double myRange = getTransmitRange();
+//		return this.host.getLocation().distance(
+//				anotherInterface.getHost().getLocation()) <= myRange;
 	}
 	
 	/**

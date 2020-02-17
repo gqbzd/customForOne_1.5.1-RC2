@@ -49,10 +49,11 @@ public class TestInterface extends NetworkInterface {
 	 * connect(Connection, NetworkInterface) for the actual connection.
 	 * @param anotherInterface The host to connect to
 	 */
-	public void connect(NetworkInterface anotherInterface) {
+	public boolean connect(NetworkInterface anotherInterface) {
 		Connection con = new CBRConnection(this.getHost(),this,
 				anotherInterface.getHost(),anotherInterface, transmitSpeed);
 		this.connect(con, anotherInterface);
+		return true;
 	}
 
 	/**

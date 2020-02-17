@@ -18,6 +18,8 @@ import core.Settings;
 import core.SimClock;
 import core.SimError;
 import core.SimScenario;
+import movement.MovementModel;
+import routing.MessageRouter;
 
 /**
  * Abstract superclass for all reports. All settings defined in this class
@@ -119,8 +121,11 @@ public abstract class Report {
 			if (!outDir.endsWith("/")) {
 				outDir += "/";	// make sure dir ends with directory delimiter
 			}
+//			outFileName = outDir + scenarioName + 
+//				"_" + this.getClass().getSimpleName();
+			//自定义文件名
 			outFileName = outDir + scenarioName + 
-				"_" + this.getClass().getSimpleName();
+					"_seed" +MovementModel.reportSeed+"_buffer"+ convertIdentification(MessageRouter.reportBufferSize);
 			if (outputInterval == -1) {
 				outFileName += OUT_SUFFIX; // no intervalled reports
 			}
@@ -128,6 +133,35 @@ public abstract class Report {
 		}
 				
 		checkDirExistence(outFileName);
+	}
+	
+	/**
+	 * 自定义转换文件标识
+	 * 200;175;150;125;100;75;50
+	 * @param key
+	 * @return
+	 */
+	public static int convertIdentification(int key) {
+		switch (key) {
+		case 50000000:
+			return 200;
+		case 43750000:
+			return 175;
+		case 37500000:
+			return 150;
+		case 31250000:
+			return 125;
+		case 25000000:
+			return 100;
+		case 18750000:
+			return 75;
+		case 12500000:
+			return 50;
+		default:
+			break;
+		}
+		
+		return 0;
 	}
 
 	/**
@@ -314,6 +348,7 @@ public abstract class Report {
 	}
 	
 	/**
+	 * 设置了命名空间为Report,
 	 * Returns a Settings object initialized for the report class' name space
 	 * that uses {@value REPORT_NS} as the secondary name space.
 	 * @return a Settings object initialized for the report class' name space

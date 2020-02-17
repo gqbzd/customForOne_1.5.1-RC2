@@ -58,7 +58,7 @@ public class InterferenceLimitedInterface extends NetworkInterface {
 	 * active and within range of this host for the connection to succeed. 
 	 * @param anotherInterface The host to connect to
 	 */
-	public void connect(NetworkInterface anotherInterface) {
+	public boolean connect(NetworkInterface anotherInterface) {
 		if (isScanning() 
 				&& anotherInterface.getHost().isRadioActive()
 				&& isWithinRange(anotherInterface)
@@ -69,7 +69,9 @@ public class InterferenceLimitedInterface extends NetworkInterface {
 			Connection con = new VBRConnection(this.host, this,
 					anotherInterface.getHost(), anotherInterface);
 			connect(con, anotherInterface);
+			return true;
 		}
+		return false;
 	}
 
 	/**

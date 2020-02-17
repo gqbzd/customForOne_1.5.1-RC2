@@ -71,7 +71,7 @@ public class DTNHost implements Comparable<DTNHost> {
 		for (NetworkInterface i : interf) {
 			NetworkInterface ni = i.replicate();
 			ni.setHost(this);//接口保存当前主机
-			net.add(ni);//当前主机保存此接口
+			net.add(ni);//当前结点保存此接口
 		}	
 
 		// TODO - think about the names of the interfaces and the nodes

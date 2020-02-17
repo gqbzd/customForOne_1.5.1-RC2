@@ -250,7 +250,8 @@ public class Settings {
 	public static void init(String propFile) throws SettingsError {
 		String outFile;
 		try {
-			//自定义，禁止读取默认配置文件，会出现自己定的配置文件没有实现默认配置文件中的接口的bug
+			//自定义，禁止读取默认配置文件，会出现自己定义的配置文件里的group实现了默认配置文件中的接口的bug
+			//（本义是，既然本配置文件中没有配置，你就别去实现没有的接口（此没有的接口指的是默认配置文件中读取的））
 //			if (new File(DEF_SETTINGS_FILE).exists()) {
 //				Properties defProperties = new Properties();
 //				defProperties.load(new FileInputStream(DEF_SETTINGS_FILE));
@@ -333,6 +334,8 @@ public class Settings {
 	}
 	
 	/**
+	 * 第二个布尔值参数决定是否使用公有配置
+	 * 举例（参考group的配置），首先默认的namespace指的是各个私有的，而第二个secondaryNamespace是指的公共的配置
 	 * Returns full (namespace prefixed) property name for setting.
 	 * @param name Name of the settings 
 	 * @param secondary If true, the secondary namespace is used.
@@ -412,6 +415,7 @@ public class Settings {
 	}
 	
 	/**
+	 * 程序可能会运行很多次,根据不同次程序运行的索引取出配置文件里对应的值
 	 * Parses run-specific settings from a String value
 	 * @param value The String to parse
 	 * @return The runIndex % arrayLength'th value of the run array
@@ -420,7 +424,7 @@ public class Settings {
 		final String RUN_ARRAY_START = "[";
 		final String RUN_ARRAY_END = "]";
 		final String RUN_ARRAY_DELIM = ";";
-		final int MIN_LENGTH = 3; // minimum run is one value. e.g. "[v]"
+		final int MIN_LENGTH = 3; // minimum run is one value. e.g. "[v]" '[''v'']'一共3个字符
 		
 		if (!value.startsWith(RUN_ARRAY_START) || 
 			!value.endsWith(RUN_ARRAY_END) || 
@@ -431,7 +435,7 @@ public class Settings {
 		
 		value = value.substring(1,value.length()-1); // remove brackets
 		String[] valueArr = value.split(RUN_ARRAY_DELIM);
-		int arrIndex = runIndex % valueArr.length;
+		int arrIndex = runIndex % valueArr.length;//更加鲁棒robustness
 		value = valueArr[arrIndex].trim();
 
 		return value;
